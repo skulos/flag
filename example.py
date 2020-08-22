@@ -8,4 +8,4 @@ if __name__ == '__main__':
     flag.parse()
 
     print(env.upper())
-    print (workers + 3)
+    print(workers.value + 3)
