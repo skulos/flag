@@ -3,7 +3,7 @@
     flag.core
     ~~~~~~~~~
 """
-from .utils import text_type
+#from .utils import text_type
 from . import registry
 
 
@@ -32,7 +32,7 @@ class Flag(object):
         self.value = val
 
     def add_to_parser(self, parser):
-        name = "--" + self.name
+        name = "-" + self.name
 
         parser.add_argument(
             name, default=self.default, help=self.help,
@@ -83,17 +83,32 @@ class ArithmeticOperators(object):
     def __rmul__(self, other):
         return other * self.type(self)
 
+class BoolOperations(object):
+    def __eq__(self, other):
+        return self.type(self) == other
+
+    def __ne__(self, other):
+        return self.type(self) != other
+
 
 class IntFlag(Flag, ComparisonOperators, ArithmeticOperators, BaseMethods):
-    """ IntFlag is a flag that tries to behave like an int"""
+    """ IntFlag is a flag that tries to behave like an int """
     type = int
+
+    def __str__(self):
+        return self.val().__str__()
+
+    
+class BoolFlag(Flag, BoolOperations):
+    """ BoolFlag is a flag that tries to behave like an bool """
+    type = bool
 
     def __str__(self):
         return self.val().__str__()
 
 
 class StringFlag(Flag, ComparisonOperators, ArithmeticOperators, BaseMethods):
-    """ StringFlag is a flag that tries to behave like a string"""
+    """ StringFlag is a flag that tries to behave like a string """
 
     def __str__(self):
         return self.val()
@@ -112,7 +127,7 @@ class StringFlag(Flag, ComparisonOperators, ArithmeticOperators, BaseMethods):
 
     @property
     def type(self):
-        return text_type
+        return str
 
 
 def int(name, *args, **kwargs):
@@ -123,5 +138,10 @@ def int(name, *args, **kwargs):
 
 def string(name, *args, **kwargs):
     flag = StringFlag(name, *args, **kwargs)
+    registry.add(flag)
+    return flag
+
+def bool(name, *args, **kwargs):
+    flag = BoolFlag(name, *args, **kwargs)
     registry.add(flag)
     return flag
